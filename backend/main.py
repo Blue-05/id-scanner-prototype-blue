@@ -23,7 +23,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://id-scanner-prototype.netlify.app/",
+        "https://id-scanner-prototype.netlify.app",
     ],
     allow_credentials=False,
     allow_methods=["*"],
