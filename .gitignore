@@ -1,0 +1,6 @@
+.IDSCAN/
+__pycache__/
+*.pyc
+
+seed.py
+.env

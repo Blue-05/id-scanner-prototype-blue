@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>College ID Scanner</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <!-- QR Scanner library -->
+    <script
+        src="https://unpkg.com/html5-qrcode"
+        type="text/javascript">
+    </script>
+</head>
+
+<body>
+
+    <main class="app">
+
+        <!-- Header -->
+
+        <header class="header">
+            <h1>College ID Scanner</h1>
+            <p>Scan your college ID QR code</p>
+        </header>
+
+
+        <!-- Scanner -->
+
+        <section class="scanner-card">
+
+            <div id="reader"></div>
+
+            <button
+                id="start-camera"
+                class="primary-button"
+            >
+                Start Camera
+            </button>
+
+            <p
+                id="scanner-status"
+                class="scanner-status"
+            >
+                Camera is not active
+            </p>
+
+        </section>
+
+
+        <!-- Result -->
+
+        <section
+            id="result-card"
+            class="result-card hidden"
+        >
+
+            <div
+                id="result-icon"
+                class="result-icon"
+            >
+                ✓
+            </div>
+
+            <h2 id="result-title">
+                Entry Recorded
+            </h2>
+
+            <div class="student-info">
+
+                <div class="info-row">
+                    <span>Student ID</span>
+                    <strong id="student-id">-</strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Name</span>
+                    <strong id="student-name">-</strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Course</span>
+                    <strong id="student-course">-</strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Year</span>
+                    <strong id="student-year">-</strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Time</span>
+                    <strong id="scan-time">-</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Error -->
+
+        <section
+            id="error-card"
+            class="error-card hidden"
+        >
+            <div class="error-icon">!</div>
+
+            <h2>Scan Failed</h2>
+
+            <p id="error-message">
+                Something went wrong.
+            </p>
+        </section>
+
+
+        <!-- Footer -->
+
+        <footer>
+            College Entry Management System
+        </footer>
+
+    </main>
+
+
+    <script
+        src="script.js">
+    </script>
+
+</body>
+
+</html>
