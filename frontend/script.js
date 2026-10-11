@@ -1,24 +1,57 @@
 const startButton = document.getElementById("start-camera");
 const scannerStatus = document.getElementById("scanner-status");
 
-const resultCard = document.getElementById("result-card");
-const errorCard = document.getElementById("error-card");
+// const resultCard = document.getElementById("result-card");
+// const errorCard = document.getElementById("error-card");
 
-const resultTitle = document.getElementById("result-title");
-const resultIcon = document.getElementById("result-icon");
+// const resultTitle = document.getElementById("result-title");
+// const resultIcon = document.getElementById("result-icon");
 
-const studentIdElement = document.getElementById("student-id");
-const studentNameElement = document.getElementById("student-name");
-const studentCourseElement = document.getElementById("student-course");
-const studentYearElement = document.getElementById("student-year");
-const scanTimeElement = document.getElementById("scan-time");
+// const studentIdElement = document.getElementById("student-id");
+// const studentNameElement = document.getElementById("student-name");
+// const studentCourseElement = document.getElementById("student-course");
+// const studentYearElement = document.getElementById("student-year");
+// const scanTimeElement = document.getElementById("scan-time");
+
+const historyBody =
+    document.getElementById("scan-history");
+
+const scanCount =
+    document.getElementById("scan-count");
+
+const approvalModal =
+    document.getElementById("approval-modal");
+
+const approvalMessage =
+    document.getElementById("approval-message");
 
 const errorMessage = document.getElementById("error-message");
+const exitTimeButton = document.getElementById("exittimeconfirm");
+
+const approveButton =
+    document.getElementById("approve-early-exit");
+
+const cancelApprovalButton =
+    document.getElementById("cancel-approval");
+
+approveButton.addEventListener(
+    "click",
+    approveEarlyExit
+);
+
+
+cancelApprovalButton.addEventListener(
+    "click",
+    cancelEarlyExit
+);
+
+const API_URL = "https://id-scanner-prototype-blue.onrender.com";
 
 
 let scanner = null;
 let scannerRunning = false;
 let processingScan = false;
+let pendingStudentId = null;
 
 
 /* ----------------------------------
@@ -34,8 +67,6 @@ async function startScanner() {
         return;
     }
 
-    hideResult();
-    hideError();
 
     startButton.disabled = true;
 
@@ -136,14 +167,14 @@ function onScanFailure(error) {
    Send QR data to backend
 ---------------------------------- */
 
-async function sendScanToBackend(studentId) {
+async function sendScanToBackend(studentId, approveEarlyExit = false) {
 
     scannerStatus.textContent =
         "Processing student ID...";
 
     try {
 
-        const response = await fetch("/api/scan", {
+        const response = await fetch(`${API_URL}/api/scan`, {
 
             method: "POST",
 
@@ -152,7 +183,8 @@ async function sendScanToBackend(studentId) {
             },
 
             body: JSON.stringify({
-                student_id: studentId.trim()
+                student_id: studentId.trim(),
+                approve_early_exit: approveEarlyExit
             })
 
         });
@@ -169,104 +201,282 @@ async function sendScanToBackend(studentId) {
         }
 
 
-        displayScanResult(data);
+        if (
+            data.status ===
+            "approval_required"
+        ) {
+
+            pendingStudentId =
+                studentId;
+
+            showApprovalPrompt(data);
+
+            processingScan = false;
+
+            return;
+        }
+
+
+        if (
+            data.status ===
+            "recorded"
+        ) {
+
+            addScanRow(data);
+        }
 
 
     } catch (error) {
 
         console.error(error);
 
-        showError(error.message);
-
-    }
-
-
-    /*
-     * Wait before allowing another scan.
-     *
-     * This prevents the same QR code from
-     * being scanned repeatedly.
-     */
-
-    setTimeout(() => {
-
-        processingScan = false;
-
         scannerStatus.textContent =
-            "Ready for next scan.";
+            error.message;
 
-    }, 2500);
-}
+    } finally {
 
+        if (!approvalModal.classList.contains(
+            "hidden"
+        )) {
+            return;
+        }
 
-/* ----------------------------------
-   Display successful scan
----------------------------------- */
+        setTimeout(() => {
 
-function displayScanResult(data) {
+            processingScan = false;
 
-    hideError();
+            scannerStatus.textContent =
+                "Ready for next scan.";
 
-    resultCard.classList.remove("hidden");
-
-
-    studentIdElement.textContent =
-        data.student_id;
-
-    studentNameElement.textContent =
-        data.name;
-
-    studentCourseElement.textContent =
-        data.course;
-
-    studentYearElement.textContent =
-        `Year ${data.year}`;
-
-
-    const date = new Date(data.timestamp);
-
-    scanTimeElement.textContent =
-        date.toLocaleTimeString();
-
-
-    if (data.status === "entry") {
-
-        resultTitle.textContent =
-            "Entry Recorded";
-
-        resultIcon.textContent = "✓";
-
-    } else {
-
-        resultTitle.textContent =
-            "Exit Recorded";
-
-        resultIcon.textContent = "→";
+        }, 2500);
     }
 }
+
+
+
+
+exitTimeButton.addEventListener("click",setExitTime);
+async function setExitTime() {
+    const exitTime = document.getElementById("exittime").value;
+
+    try{
+        const response = await fetch(`${API_URL}/api/settings/exit-time`,
+        {
+            method:'POST', headers:{"Content-Type":"application/json"},body: JSON.stringify({exit_time:exitTime})
+        })
+
+        if (!response.ok) {
+            throw new Error(
+                "Failed to update exit time."
+            );
+        }
+
+        const data = await response.json();
+
+        alert(
+            `Exit time set to ${data.exit_time}`
+        );
+    } catch (error){
+        console.error(error);
+        alert("Couldn't update Time");
+    }
+    
+};
 
 
 /* ----------------------------------
    Error
 ---------------------------------- */
 
-function showError(message) {
+// function showError(message) {
 
-    hideResult();
+//     hideResult();
 
-    errorMessage.textContent = message;
+//     errorMessage.textContent = message;
 
-    errorCard.classList.remove("hidden");
+//     errorCard.classList.remove("hidden");
+// }
+
+
+// function hideError() {
+
+//     errorCard.classList.add("hidden");
+// }
+
+
+// function hideResult() {
+
+//     resultCard.classList.add("hidden");
+// }
+
+
+/* ----------------------------------
+   NEW FUNCS
+---------------------------------- */
+
+
+function addScanRow(data) {
+
+    const row =
+        document.createElement("tr");
+
+
+    const statusClass =
+        data.scan_status === "entry"
+            ? "status-entry"
+            : "status-exit";
+
+
+    row.innerHTML = `
+        <td>${escapeHtml(data.student_id)}</td>
+
+        <td>${escapeHtml(data.name)}</td>
+
+        <td>${escapeHtml(data.course)}</td>
+
+        <td>${data.year}</td>
+
+        <td>
+            <span class="status ${statusClass}">
+                ${data.scan_status.toUpperCase()}
+            </span>
+        </td>
+
+        <td>
+            ${formatTime(data.timestamp)}
+        </td>
+    `;
+
+
+    // Newest scan at the top.
+    historyBody.prepend(row);
+
+
+    updateScanCount();
 }
 
 
-function hideError() {
+function updateScanCount() {
 
-    errorCard.classList.add("hidden");
+    const count =
+        historyBody.children.length;
+
+    scanCount.textContent =
+        `${count} scan${count === 1 ? "" : "s"}`;
 }
 
 
-function hideResult() {
+function showApprovalPrompt(data) {
 
-    resultCard.classList.add("hidden");
+    approvalMessage.textContent =
+        `${data.name} (${data.student_id}) ` +
+        `is attempting to exit before ` +
+        `${formatAllowedTime(
+            data.allowed_exit_time
+        )}. ` +
+        `Approve only if valid permission has been provided.`;
+
+
+    approvalModal.classList.remove(
+        "hidden"
+    );
+}
+
+
+function approveEarlyExit() {
+
+    if (!pendingStudentId) {
+        return;
+    }
+
+
+    const studentId =
+        pendingStudentId;
+
+
+    closeApprovalPrompt();
+
+
+    // Keep processing locked while
+    // the approved request is sent.
+    processingScan = true;
+
+
+    sendScanToBackend(
+        studentId,
+        true
+    );
+}
+
+
+function cancelEarlyExit() {
+
+    closeApprovalPrompt();
+
+    pendingStudentId = null;
+
+    processingScan = false;
+
+    scannerStatus.textContent =
+        "Exit not recorded. Ready for next scan.";
+}
+
+
+function closeApprovalPrompt() {
+
+    approvalModal.classList.add(
+        "hidden"
+    );
+}
+
+
+function formatTime(timestamp) {
+
+    const date =
+        new Date(timestamp);
+
+    return date.toLocaleTimeString(
+        [],
+        {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        }
+    );
+}
+
+
+function formatAllowedTime(timeString) {
+
+    const [hours, minutes] =
+        timeString.split(":");
+
+    const date =
+        new Date();
+
+    date.setHours(
+        Number(hours),
+        Number(minutes),
+        0,
+        0
+    );
+
+    return date.toLocaleTimeString(
+        [],
+        {
+            hour: "numeric",
+            minute: "2-digit"
+        }
+    );
+}
+
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = value;
+
+    return div.innerHTML;
 }

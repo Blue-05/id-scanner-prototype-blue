@@ -75,3 +75,12 @@ class EntryLog(Base):
         default=datetime.now,
         nullable=False,
     )
+
+class AppSetting(Base):
+    __tablename__ = "app_settings"
+    key: Mapped[str] = mapped_column(
+        String(50), primary_key=True
+    )
+    value: Mapped[str] = mapped_column(
+        String(50), nullable=False
+    )

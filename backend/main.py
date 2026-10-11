@@ -5,8 +5,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
+from .models import AppSetting
 from .database import Base, engine, get_db
-from .schemas import ScanRequest, ScanResponse
+from .schemas import ScanRequest, ScanResponse, ExitTimeRequest, ExitTimeResponse
 from .scanner import process_scan
 
 
@@ -55,22 +56,38 @@ def scan(
     db: Session = Depends(get_db),
 ):
     log = process_scan(
-        db,
-        request.student_id,
+        db=db,
+        student_id=request.student_id,
+        approve_early_exit=request.approve_early_exit
     )
 
-    if log is None:
+    if log["status"] == "not_found":
         raise HTTPException(
             status_code=404,
             detail="Student ID not found",
         )
 
+    return log
+
+@app.post("/api/settings/exit-time",response_model=ExitTimeResponse)
+def set_exit_time(request:ExitTimeRequest,db: Session = Depends(get_db)):
+    setting = (
+        db.query(AppSetting)
+        .filter(AppSetting.key == "exit_allowed_time")
+        .first()
+    )
+
+    if setting is None:
+        setting = AppSetting(
+            key="exit_allowed_time",
+            value=request.exit_time,
+        )
+        db.add(setting)
+    else:
+        setting.value = request.exit_time
+
+    db.commit()
+
     return {
-        "success": True,
-        "student_id": log.student_id,
-        "name": log.student_name,
-        "course": log.course,
-        "year": log.year,
-        "status": log.status,
-        "timestamp": log.timestamp,
+        "exit_time": setting.value
     }

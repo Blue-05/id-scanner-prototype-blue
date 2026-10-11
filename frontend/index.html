@@ -57,52 +57,41 @@
 
         </section>
 
+        <section class="set-exit-time">
+            <div class="input-time">
+                <label for="exittime">Set Exit Time</label>
+                <input type="time" id="exittime">
+                <button id="exittimeconfirm">Set Time</button>
+            </div>
+        </section>
+
 
         <!-- Result -->
 
-        <section
-            id="result-card"
-            class="result-card hidden"
-        >
+        <section class="scan-history-card">
 
-            <div
-                id="result-icon"
-                class="result-icon"
-            >
-                ✓
+            <div class="history-header">
+                <h2>Scan History</h2>
+                <span id="scan-count">0 scans</span>
             </div>
 
-            <h2 id="result-title">
-                Entry Recorded
-            </h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Course</th>
+                            <th>Year</th>
+                            <th>Status</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
 
-            <div class="student-info">
-
-                <div class="info-row">
-                    <span>Student ID</span>
-                    <strong id="student-id">-</strong>
-                </div>
-
-                <div class="info-row">
-                    <span>Name</span>
-                    <strong id="student-name">-</strong>
-                </div>
-
-                <div class="info-row">
-                    <span>Course</span>
-                    <strong id="student-course">-</strong>
-                </div>
-
-                <div class="info-row">
-                    <span>Year</span>
-                    <strong id="student-year">-</strong>
-                </div>
-
-                <div class="info-row">
-                    <span>Time</span>
-                    <strong id="scan-time">-</strong>
-                </div>
-
+                    <tbody id="scan-history">
+                        <!-- Rows added by JavaScript -->
+                    </tbody>
+                </table>
             </div>
 
         </section>
@@ -122,6 +111,48 @@
                 Something went wrong.
             </p>
         </section>
+
+
+        <div
+            id="approval-modal"
+            class="modal hidden"
+        >
+            <div class="modal-content">
+
+                <div class="warning-icon">!</div>
+
+                <h2>Early Exit Warning</h2>
+
+                <p id="approval-message">
+                    This student is attempting to exit before
+                    the permitted exit time.
+                </p>
+
+                <p class="approval-note">
+                    Approve only if the student has valid permission
+                    and can provide the required note.
+                </p>
+
+                <div class="modal-actions">
+
+                    <button
+                        id="cancel-approval"
+                        class="secondary-button"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        id="approve-early-exit"
+                        class="approve-button"
+                    >
+                        Approve Exit
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
 
 
         <!-- Footer -->

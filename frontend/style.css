@@ -128,83 +128,204 @@ body {
    Result
 ---------------------------------- */
 
-.result-card {
+.scan-history-card {
     background: white;
-
-    margin-top: 20px;
-
-    padding: 22px;
-
-    border-radius: 18px;
-
-    box-shadow:
-        0 4px 15px rgba(0, 0, 0, 0.08);
-
-    text-align: center;
+    border-radius: 16px;
+    padding: 18px;
+    margin-top: 18px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
 }
 
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
 
-.result-icon {
-    width: 55px;
-    height: 55px;
+.history-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
 
-    margin: 0 auto 12px;
+#scan-count {
+    font-size: 13px;
+    color: #777;
+}
 
-    border-radius: 50%;
+.table-container {
+    max-height: 360px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+}
+
+table {
+    width: 100%;
+    min-width: 650px;
+    border-collapse: collapse;
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    background: #f5f5f5;
+    z-index: 1;
+}
+
+th,
+td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid #eeeeee;
+    white-space: nowrap;
+}
+
+th {
+    font-size: 13px;
+    color: #555;
+}
+
+td {
+    font-size: 14px;
+}
+
+.status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.status-entry {
+    background: #e7f7ed;
+    color: #187a3d;
+}
+
+.status-exit {
+    background: #fff0e5;
+    color: #b45309;
+}
+
+#exittimeconfirm {
+    width: 100%;
+
+    border: none;
+    border-radius: 12px;
+
+    padding: 14px;
+
+    margin-top: 16px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+#exittimeconfirm:active{
+    transform: scale(0.98);
+}
+
+/* ---------------------------------
+    Invalid Exit Popup
+----------------------------------- */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    background: #dcfce7;
-    color: #16a34a;
+    padding: 20px;
 
-    font-size: 28px;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 420px;
+
+    background: white;
+    border-radius: 18px;
+
+    padding: 25px;
+
+    text-align: center;
+
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.warning-icon {
+    width: 50px;
+    height: 50px;
+
+    margin: 0 auto 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #fff3cd;
+    color: #b45309;
+
+    font-size: 25px;
     font-weight: bold;
 }
 
-
-.result-card h2 {
-    font-size: 20px;
-    margin-bottom: 20px;
+.modal-content h2 {
+    margin: 0 0 12px;
 }
 
-
-.student-info {
-    text-align: left;
+.modal-content p {
+    line-height: 1.5;
 }
 
+.approval-note {
+    font-size: 13px;
+    color: #666;
+}
 
-.info-row {
+.modal-actions {
     display: flex;
-
-    justify-content: space-between;
-    align-items: center;
-
-    padding: 13px 0;
-
-    border-bottom: 1px solid #e5e7eb;
-
-    gap: 15px;
+    gap: 10px;
+    margin-top: 20px;
 }
 
+.modal-actions button {
+    flex: 1;
+    padding: 12px;
 
-.info-row:last-child {
-    border-bottom: none;
+    border: none;
+    border-radius: 8px;
+
+    font-weight: 600;
+    cursor: pointer;
 }
 
-
-.info-row span {
-    color: #6b7280;
-    font-size: 14px;
+.secondary-button {
+    background: #eeeeee;
+    color: #333;
 }
 
-
-.info-row strong {
-    text-align: right;
-    font-size: 14px;
+.approve-button {
+    background: #198754;
+    color: white;
 }
-
 
 /* ----------------------------------
    Error
